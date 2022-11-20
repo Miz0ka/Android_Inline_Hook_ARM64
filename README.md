@@ -44,6 +44,10 @@ You can name the `__attribute__((constructor)) ModifyIBored()` function at your 
 
 After you finish the args above, just `ndk-build` and you will get your .so file.
 
+# Fork comment
+
+An other approche to load the hook in ram can be seen in this article: [modding unity game by Areizen](https://www.areizen.fr/post/modding-unity-game/)
+
 # ARM64 Design
 
 ![](https://gtoad.github.io/img/in-post/post-android-native-hook-practice-ARM64/arm64hook.png)
