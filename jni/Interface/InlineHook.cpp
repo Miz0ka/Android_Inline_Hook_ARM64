@@ -21,17 +21,17 @@ void ModifyIBored() __attribute__((constructor));
 void before_main() __attribute__((constructor));
 
 typedef std::vector<INLINE_HOOK_INFO*> InlineHookInfoPVec;
-static InlineHookInfoPVec gs_vecInlineHookInfo;     //¹ÜÀíHOOKµã
+static InlineHookInfoPVec gs_vecInlineHookInfo;     //ï¿½ï¿½ï¿½ï¿½HOOKï¿½ï¿½
 
 void before_main() {
     LOGI("Hook is auto loaded!\n");
 }
 
 /**
- * ¶ÔÍâinline hook½Ó¿Ú£¬¸ºÔğ¹ÜÀíinline hookĞÅÏ¢
- * @param  pHookAddr     ÒªhookµÄµØÖ·
- * @param  onCallBack    Òª²åÈëµÄ»Øµ÷º¯Êı
- * @return               inlinehookÊÇ·ñÉèÖÃ³É¹¦£¨ÒÑ¾­ÉèÖÃ¹ı£¬ÖØ¸´ÉèÖÃ·µ»Øfalse£©
+ * External inline hook interface, responsible for managing inline hook information
+ * @param pHookAddr the address to hook
+ * @param onCallBack callback function to be inserted
+ * @return inlinehook is set successfully (already set, repeated setting returns false)
  */
 bool InlineHook(void *pHookAddr, void (*onCallBack)(struct user_pt_regs *))
 {
@@ -60,9 +60,9 @@ bool InlineHook(void *pHookAddr, void (*onCallBack)(struct user_pt_regs *))
 }
 
 /**
- * ¶ÔÍâ½Ó¿Ú£¬ÓÃÓÚÈ¡Ïûinline hook
- * @param  pHookAddr ÒªÈ¡Ïûinline hookµÄÎ»ÖÃ
- * @return           ÊÇ·ñÈ¡Ïû³É¹¦£¨²»´æÔÚ·µ»ØÈ¡ÏûÊ§°Ü£©
+ * External interface, used to cancel inline hook
+ * @param pHookAddr The position to cancel the inline hook
+ * @return Whether the cancellation is successful (if there is no return cancellation failure)
  */
 bool UnInlineHook(void *pHookAddr)
 {
@@ -100,11 +100,11 @@ bool UnInlineHook(void *pHookAddr)
 }
 
 /**
- * ÓÃ»§×Ô¶¨ÒåµÄstubº¯Êı£¬Ç¶ÈëÔÚhookµãÖĞ£¬¿ÉÖ±½Ó²Ù×÷¼Ä´æÆ÷µÈ¸Ä±äÓÎÏ·Âß¼­²Ù×÷
- * ÕâÀï½«R0¼Ä´æÆ÷Ëø¶¨Îª0x333£¬Ò»¸öÔ¶´óÓÚ30µÄÖµ
- * @param regs ¼Ä´æÆ÷½á¹¹£¬±£´æ¼Ä´æÆ÷µ±Ç°hookµãµÄ¼Ä´æÆ÷ĞÅÏ¢
+ * User-defined stub function, embedded in the hook point, can directly operate the register and change the logic operation of the game
+ * Here the R0 register is locked to 0x333, a value much greater than 30
+ * @param regs register structure, save the register information of the current hook point of the register
  */
-void EvilHookStubFunctionForIBored(user_pt_regs *regs) //²ÎÊıregs¾ÍÊÇÖ¸ÏòÕ»ÉÏµÄÒ»¸öÊı¾İ½á¹¹£¬ÓÉµÚ¶ş²¿·ÖµÄmov r0, spËù´«µİ¡£
+void EvilHookStubFunctionForIBored(user_pt_regs *regs) //The parameter regs points to a data structure on the stack, which is passed by the second part of mov r0, sp
 {
     LOGI("In Evil Hook Stub.");
     //regs->uregs[2] = 0x333; //regs->uregs[0]=0x333
@@ -112,15 +112,15 @@ void EvilHookStubFunctionForIBored(user_pt_regs *regs) //²ÎÊıregs¾ÍÊÇÖ¸ÏòÕ»ÉÏµÄÒ
 }
 
 /**
- * Õë¶ÔIBoredÓ¦ÓÃ£¬Í¨¹ıinline hook¸Ä±äÓÎÏ·Âß¼­µÄ²âÊÔº¯Êı
+ * For IBored applications, test functions that change game logic through inline hooks
  */
 void ModifyIBored()
 {
     LOGI("In IHook's ModifyIBored.");
 
-    int target_offset = 0x600; //*ÏëHookµÄÄ¿±êÔÚÄ¿±êsoÖĞµÄÆ«ÒÆ*
+    int target_offset = 0x600; //*ï¿½ï¿½Hookï¿½ï¿½Ä¿ï¿½ï¿½ï¿½ï¿½Ä¿ï¿½ï¿½soï¿½Ğµï¿½Æ«ï¿½ï¿½*
 
-    void* pModuleBaseAddr = GetModuleBaseAddr(-1, "libhellojni.so"); //Ä¿±êsoµÄÃû³Æ
+    void* pModuleBaseAddr = GetModuleBaseAddr(-1, "libhellojni.so"); //Ä¿ï¿½ï¿½soï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
     if(pModuleBaseAddr == 0)
     {
@@ -128,8 +128,8 @@ void ModifyIBored()
         return;
     }
     
-    uint64_t uiHookAddr = (uint64_t)pModuleBaseAddr + target_offset; //ÕæÊµHookµÄÄÚ´æµØÖ·
+    uint64_t uiHookAddr = (uint64_t)pModuleBaseAddr + target_offset; //ï¿½ï¿½ÊµHookï¿½ï¿½ï¿½Ú´ï¿½ï¿½Ö·
 
     
-    InlineHook((void*)(uiHookAddr), EvilHookStubFunctionForIBored); //*µÚ¶ş¸ö²ÎÊı¾ÍÊÇHookÏëÒª²åÈëµÄ¹¦ÄÜ´¦Àíº¯Êı*
+    InlineHook((void*)(uiHookAddr), EvilHookStubFunctionForIBored); //*The second parameter is the function processing function that Hook wants to insert*
 }

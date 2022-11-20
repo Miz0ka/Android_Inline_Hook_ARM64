@@ -1,7 +1,6 @@
 #include "fixPCOpcode.h"
 
-//这里的代码建议看文章：《Android Inline Hook中的指令修复详解》（https://gtoad.github.io/2018/07/13/Android-Inline-Hook-Fix/）
-
+//The code here is recommended to read the article: "Detailed Explanation of Instruction Repair in Android Inline Hook" (https://gtoad.github.io/2018/07/13/Android-Inline-Hook-Fix/)
 enum INSTRUCTION_TYPE {
 
 
@@ -45,8 +44,8 @@ enum INSTRUCTION_TYPE {
 
 	// BX PC
 	BX_ARM,
-	// ADD Rd, PC, Rm (Rd != PC, Rm != PC) 在对ADD进行修正时，采用了替换PC为Rr的方法，当Rd也为PC时，由于之前更改了Rr的值，可能会影响跳转后的正常功能;实际汇编中没有发现Rm也为PC的情况，故未做处理。
-	ADD_ARM,
+	// ADD Rd, PC, Rm (Rd != PC, Rm != PC) When amending ADD, the method of replacing PC with Rr is adopted. When Rd is also PC, the normal function after the jump may be affected due to the change of the value of Rr before; it is not found in the actual assembly that Rm is also PC. case, it was not dealt with.
+    ADD_ARM,
 	// ADR Rd, <label>
 	ADR1_ARM,
 	// ADR Rd, <label>
@@ -310,7 +309,7 @@ int fixPCOpcodeArm(void *fixOpcodes , INLINE_HOOK_INFO* pstInlineHook)
     currentOpcode = pstInlineHook->szbyBackupOpcodes + sizeof(uint8_t)*backUpPos;
     LOGI("sizeof(uint8_t) : %D", sizeof(uint8_t));
 
-    pc = pstInlineHook->pHookAddr; //pc变量用于保存原本指令执行时的pc值
+    pc = pstInlineHook->pHookAddr; //The pc variable is used to save the pc value when the original instruction is executed
     lr = pstInlineHook->pHookAddr + pstInlineHook->backUpLength;
 
     if(pstInlineHook == NULL)
@@ -323,7 +322,7 @@ int fixPCOpcodeArm(void *fixOpcodes , INLINE_HOOK_INFO* pstInlineHook)
 	memcpy(fixOpcodes+fixPos, tmpFixOpcodes, offset);
 	fixPos=+offset;
 
-    while(1) // 在这个循环中，每次都处理一个arm64命令
+    while(1) // In this loop, one arm64 command is processed each time
     {
         //LOGI("-------------START----------------");
         LOGI("currentOpcode is %x",*currentOpcode);
@@ -411,7 +410,7 @@ int fixPCOpcodeArm64(uint64_t pc, uint64_t lr, uint32_t instruction, uint32_t *t
 	//trampoline_instructions[trampoline_pos++] == 0xf85f83e0; // ldr x0, [sp, #-0x8] recover the x0 register
     LOGI("THE ARM64 OPCODE IS %x",instruction);
     type = getTypeInArm64(instruction);
-    //type = getTypeInArm(instruction); //判断该arm指令的种类
+    //type = getTypeInArm(instruction); //Judge the type of the arm instruction
 	
 	if (type == B_COND_ARM64) {
 		//STP X_tmp1, X_tmp2, [SP, -0x10]

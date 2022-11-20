@@ -17,8 +17,8 @@
 #define BYTE unsigned char
 #endif
 
-#define OPCODEMAXLEN 24      //inline hook所需要的opcodes最大长度,arm64为20
-#define BACKUP_CODE_NUM_MAX 6  //尽管备份原程序6条arm64指令。
+#define OPCODEMAXLEN 24      //The maximum length of opcodes required by inline hook, arm64 is 20
+#define BACKUP_CODE_NUM_MAX 6  //Although backing up the 6 arm64 instructions of the original program.
 
 #define LOG_TAG "GToad"
 #define LOGI(fmt, args...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, fmt, ##args);
@@ -39,15 +39,15 @@ extern unsigned long _hookstub_function_addr_s;
 extern unsigned long _old_function_addr_s;
 
 
-//hook点信息
+//hook point information
 typedef struct tagINLINEHOOKINFO{
-    void *pHookAddr;                //hook的地址
-    void *pStubShellCodeAddr;            //跳过去的shellcode stub的地址
-    void (*onCallBack)(struct user_pt_regs *);       //回调函数，跳转过去的函数地址
-    void ** ppOldFuncAddr;             //shellcode 中存放old function的地址
-    BYTE szbyBackupOpcodes[OPCODEMAXLEN];    //原来的opcodes
-    int backUpLength; //备份代码的长度，arm64模式下为20
-    int backUpFixLengthList[BACKUP_CODE_NUM_MAX]; //保存
+    void *pHookAddr;                //the address of the hook
+    void *pStubShellCodeAddr;            //The address of the shellcode stub to jump over
+    void (*onCallBack)(struct user_pt_regs *);       //Callback function, jump to the past function address
+    void ** ppOldFuncAddr;             //The address of the old function stored in the shellcode
+    BYTE szbyBackupOpcodes[OPCODEMAXLEN];    //original opcodes
+    int backUpLength; //The length of the backup code, 20 in arm64 mode
+    int backUpFixLengthList[BACKUP_CODE_NUM_MAX]; //keep
     uint64_t *pNewEntryForOldFunction;
 } INLINE_HOOK_INFO;
 
